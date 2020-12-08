@@ -25,8 +25,8 @@ app.get("/mario/:id", async (req, res)=>{
         }else{
             res.send(doc);
         }
-    }catch(err){
-        res.status(400).send({message: err.message});
+    }catch(error){
+        res.status(400).send({message: error.message});
     }
 });
 
@@ -63,22 +63,22 @@ app.patch("/mario/:id", async (req, res)=>{
             res.send(await marioModel.findOne({_id: idToChange}));
         }
         
-    }catch(err){
-        res.status(400).send({message: err.message});
+    }catch(error){
+        res.status(400).send({message: error.message});
     }
 });
 
 app.delete("/mario/:id", async (req, res)=>{
     const idToDelete = req.params.id;
     try {
-        if(await marioModel.findOne({_id:idToChange}) === null){
+        if(await marioModel.findOne({_id:idToDelete}) === null){
             res.sendStatus(400);
         }else{
             await marioModel.deleteOne({_id: idToDelete});
             res.status(200).send({message: 'character deleted'})
         }
-    }catch(err){
-        res.status(400).send({message: err.message});
+    }catch(error){
+        res.status(400).send({message: error.message});
     }
 })
 
