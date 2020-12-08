@@ -21,9 +21,9 @@ app.get("/mario/:id", async (req, res)=>{
     try{
         const doc = await marioModel.findOne({_id: idToSend});
         if(doc === null){
-            res.send("Id not found");
+            res.sendStatus(400);
         }else{
-            res.send(doc)
+            res.send(doc);
         }
     }catch(err){
         res.status(400).send({message: err.message});
@@ -46,15 +46,23 @@ app.post("/mario", async (req, res)=>{
 
 app.patch("/mario/:id", async (req, res)=>{
     const idToChange = req.params.id;
+    let flag = false;
     try {
-        for(key in req.body){
-            if(key === 'name'){
-                await marioModel.updateOne({_id: idToChange}, {"name": req.body[key]});
-            }else if(key === 'weight'){
-                await marioModel.updateOne({_id: idToChange}, {"weight": parseInt(req.body[key])});
-            }
+        if(await marioModel.findOne({_id:idToChange}) === null){
+            res.sendStatus(400);
+        }else{
+            for(key in req.body){
+                if(key === 'name'){
+                    flag = true;
+                    await marioModel.updateOne({_id: idToChange}, {"name": req.body[key]});
+                }else if(key === 'weight'){
+                    flag = true;
+                    await marioModel.updateOne({_id: idToChange}, {"weight": parseInt(req.body[key])});
+                }
+            } 
+            res.send(await marioModel.findOne({_id: idToChange}));
         }
-        res.send(await marioModel.findOne({_id: idToChange}));
+        
     }catch(err){
         res.status(400).send({message: err.message});
     }
@@ -63,8 +71,12 @@ app.patch("/mario/:id", async (req, res)=>{
 app.delete("/mario/:id", async (req, res)=>{
     const idToDelete = req.params.id;
     try {
-        await marioModel.deleteOne({_id: idToDelete});
-        res.status(200).send({message: 'character deleted'})
+        if(await marioModel.findOne({_id:idToChange}) === null){
+            res.sendStatus(400);
+        }else{
+            await marioModel.deleteOne({_id: idToDelete});
+            res.status(200).send({message: 'character deleted'})
+        }
     }catch(err){
         res.status(400).send({message: err.message});
     }
